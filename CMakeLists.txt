@@ -6,9 +6,30 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
-# For Apple Silicon, explicitly set architecture to arm64
+# Architecture handling for macOS
 if(APPLE)
-    set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "Build architectures for macOS" FORCE)
+    # Check if architecture is explicitly specified via command line
+    if(NOT DEFINED CMAKE_OSX_ARCHITECTURES OR CMAKE_OSX_ARCHITECTURES STREQUAL "")
+        # Detect host architecture and set it as the target
+        execute_process(
+            COMMAND uname -m
+            OUTPUT_VARIABLE HOST_ARCH
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        
+        message(STATUS "Detected host architecture: ${HOST_ARCH}")
+        
+        # Set architecture based on host
+        set(CMAKE_OSX_ARCHITECTURES "${HOST_ARCH}" CACHE STRING "Build architecture for macOS" FORCE)
+    endif()
+    
+    # Option for universal binary
+    option(BUILD_UNIVERSAL "Build universal binary for both arm64 and x86_64" OFF)
+    if(BUILD_UNIVERSAL)
+        set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "Build architectures for macOS" FORCE)
+    endif()
+    
+    message(STATUS "Target architecture(s): ${CMAKE_OSX_ARCHITECTURES}")
 endif()
 
 # Set output directories
@@ -45,6 +66,3 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     glm::glm
     OpenGL::GL
 )
-
-# Print architecture info for debugging
-message(STATUS "Target architectures: ${CMAKE_OSX_ARCHITECTURES}")
