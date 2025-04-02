@@ -25,7 +25,8 @@ set(GLAD_DIR "${CMAKE_SOURCE_DIR}/lib/glad")
 include_directories(${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS} ${GLAD_DIR}/include)
 
 # Add executables
-add_executable(${PROJECT_NAME} src/main.cpp ${GLAD_DIR}/src/glad.c)
+file(GLOB_RECURSE SRC_FILES src/*.cpp ${GLAD_DIR}/src/glad.c)
+add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 
 target_link_libraries(${PROJECT_NAME}
