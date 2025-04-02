@@ -36,7 +36,7 @@ GLFWwindow *create_window() {
         return nullptr;
     }
 
-    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+    framebuffer_size_callback(window, WINDOW_WIDTH, WINDOW_HEIGHT);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     return window;
@@ -47,7 +47,10 @@ uint32_t create_vert_shader() {
 		#version 330 core
 		layout (location = 0) in vec3 aPos;
 
+        out vec3 pos;
+
 		void main() {
+            pos = vec3(aPos);
 			gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
 		}
 	)";
@@ -73,10 +76,11 @@ uint32_t create_vert_shader() {
 uint32_t create_frag_shader(uint32_t vert_shader) {
     const char *frag_source = R"(
 		#version 330 core
+        in vec3 pos;
 		out vec4 FragColor;
 
 		void main() {
-			FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+			FragColor = vec4(pos.x, pos.y, pos.z, 1.0f);
 		}
 	)";
 
@@ -124,14 +128,23 @@ int main(int argc, char *argv[]) {
     GLFWwindow *window = create_window();
     if (!window) return EXIT_FAILURE;
 
-    std::array<float, 9> vertices = {-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f};
+    std::array<float, 12> vertices = {
+        0.5f,  0.5f, 0.0f,  // top right
+        0.5f, -0.5f, 0.0f,  // bottom right
+       -0.5f, -0.5f, 0.0f,  // bottom left
+       -0.5f,  0.5f, 0.0f,   // top left 
+    };
+    std::array<uint32_t, 6> indices = {
+        0, 1, 2,
+        1, 2, 3,
+    };
 
-    uint32_t vao, vbo;
+    uint32_t vao, vbo, ebo;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    // glGenBuffers(1, &vbo);
+    glGenBuffers(1, &ebo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(), GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
@@ -148,7 +161,7 @@ int main(int argc, char *argv[]) {
 
         glUseProgram(shaderProgram);
         glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
