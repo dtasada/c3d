@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
     GLFWwindow *window = create_window(WINDOW_WIDTH, WINDOW_HEIGHT);
     if (!window) return EXIT_FAILURE;
 
-    std::array<f32, 12> vertices = {
+    std::array<float, 12> vertices = {
         0.5f,
         0.5f,
         0.0f,  // top right
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
         0.0f   // top left
     };
 
-    std::array<u32, 6> indices = {
+    std::array<uint32_t, 6> indices = {
         0,
         1,
         3,  // first triangle
@@ -39,23 +39,23 @@ int main(int argc, char *argv[]) {
         3   // second triangle
     };
 
-    u32 vao, vbo, ebo;
-    glGenBuffers(1, &ebo);
+	uint32_t vao, vbo, ebo;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
 
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(), GL_STATIC_DRAW);
+
+    glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices.data(), GL_STATIC_DRAW);
 
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
 
-    glGenBuffers(1, &vbo);
-    glGenBuffers(1, &ebo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(), GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(f32), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
-    u32 shaderProgram = create_shader_program();
+    uint32_t shaderProgram = create_shader_program();
 
     while (!glfwWindowShouldClose(window)) {
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)

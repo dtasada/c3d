@@ -20,8 +20,8 @@ typedef double f64;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
-GLFWwindow *create_window(uint32_t width, uint32_t height);
+GLFWwindow *create_window(u32 width, u32 height);
 
 uint32_t create_vert_shader();
-uint32_t create_frag_shader(uint32_t vert_shader);
+uint32_t create_frag_shader(u32 vert_shader);
 uint32_t create_shader_program();

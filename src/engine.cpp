@@ -7,11 +7,12 @@
 #include <iostream>
 #include <OpenGL/gl.h>
 
+// Window dimensions
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-GLFWwindow *create_window(uint32_t width, uint32_t height) {
+GLFWwindow *create_window(u32 width, u32 height) {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -42,7 +43,10 @@ uint32_t create_vert_shader() {
 		#version 330 core
 		layout (location = 0) in vec3 aPos;
 
+        out vec3 pos;
+
 		void main() {
+            pos = vec3(aPos);
 			gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
 		}
 	)";
@@ -68,10 +72,11 @@ uint32_t create_vert_shader() {
 uint32_t create_frag_shader(uint32_t vert_shader) {
     const char *frag_source = R"(
 		#version 330 core
+        in vec3 pos;
 		out vec4 FragColor;
 
 		void main() {
-			FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+			FragColor = vec4(pos.x, pos.y, pos.z, 1.0f);
 		}
 	)";
 
